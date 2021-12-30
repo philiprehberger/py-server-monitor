@@ -6,7 +6,7 @@
 
 System metrics collector for CPU, memory, disk, and network.
 
-## Install
+## Installation
 
 ```bash
 pip install philiprehberger-server-monitor
@@ -48,6 +48,18 @@ data = snap.to_dict()
 | Disk | mountpoint, total, used, free, percent |
 | Network | bytes_sent, bytes_recv, packets_sent, packets_recv |
 
+
+## API
+
+| Function / Class | Description |
+|------------------|-------------|
+| `Monitor` | System metrics monitor with `snapshot()`, `watch()`, and `stop()` methods |
+| `Snapshot` | A point-in-time system metrics snapshot with `cpu`, `memory`, `disk`, `network` fields |
+| `CpuInfo` | CPU metrics (percent, count, count_logical, per_cpu, freq_mhz) |
+| `MemoryInfo` | Memory metrics (total, available, used, percent) with GB properties |
+| `DiskInfo` | Disk metrics for a single mount point (total, used, free, percent) |
+| `NetworkInfo` | Network metrics (bytes_sent, bytes_recv, packets_sent, packets_recv) |
+| `Alert(metric, threshold, callback)` | Threshold-based alert configuration for continuous monitoring |
 
 ## Development
 
