@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import collections
 import threading
 import time
 from dataclasses import dataclass, field
@@ -9,7 +10,16 @@ from typing import Any, Callable
 
 import psutil
 
-__all__ = ["Monitor", "Snapshot", "CpuInfo", "MemoryInfo", "DiskInfo", "NetworkInfo", "Alert"]
+__all__ = [
+    "Monitor",
+    "Snapshot",
+    "CpuInfo",
+    "MemoryInfo",
+    "DiskInfo",
+    "NetworkInfo",
+    "Alert",
+    "Trend",
+]
 
 
 @dataclass
@@ -138,12 +148,26 @@ class Alert:
     _triggered: bool = field(default=False, repr=False)
 
 
+@dataclass
+class Trend:
+    """Result of a trend analysis over a time window."""
+
+    metric: str
+    start_value: float
+    end_value: float
+    slope: float
+    duration_seconds: float
+
+
 class Monitor:
     """System metrics monitor."""
 
     def __init__(self) -> None:
         self._running = False
         self._thread: threading.Thread | None = None
+        self._recording = False
+        self._record_thread: threading.Thread | None = None
+        self._snapshots: collections.deque[Snapshot] = collections.deque()
 
     def snapshot(self) -> Snapshot:
         """Take a single point-in-time snapshot of system metrics."""
@@ -274,3 +298,77 @@ class Monitor:
     def stop(self) -> None:
         """Stop continuous monitoring."""
         self._running = False
+
+    def start_recording(
+        self,
+        interval: float = 5.0,
+        max_snapshots: int = 720,
+    ) -> None:
+        """Start a background thread that records snapshots at regular intervals.
+
+        Args:
+            interval: Seconds between snapshots.
+            max_snapshots: Maximum number of snapshots to keep in the ring buffer.
+        """
+        if self._recording:
+            return
+        self._snapshots = collections.deque(maxlen=max_snapshots)
+        self._recording = True
+
+        def record_loop() -> None:
+            while self._recording:
+                self._snapshots.append(self.snapshot())
+                time.sleep(interval)
+
+        self._record_thread = threading.Thread(target=record_loop, daemon=True)
+        self._record_thread.start()
+
+    def stop_recording(self) -> None:
+        """Stop the recording thread."""
+        self._recording = False
+
+    def get_trend(self, metric: str, window_seconds: float = 300) -> Trend:
+        """Compute a linear trend for a metric over recent snapshots.
+
+        Args:
+            metric: Dot-notation metric name (e.g., "cpu.percent", "memory.percent").
+            window_seconds: How far back to look, in seconds.
+
+        Returns:
+            A Trend object with start/end values and slope (change per second).
+
+        Raises:
+            ValueError: If there are fewer than 2 data points in the window.
+        """
+        now = time.time()
+        cutoff = now - window_seconds
+
+        points: list[tuple[float, float]] = []
+        for snap in self._snapshots:
+            if snap.timestamp >= cutoff:
+                value = self._get_metric_value(snap, metric)
+                if value is not None:
+                    points.append((snap.timestamp, value))
+
+        if len(points) < 2:
+            raise ValueError(
+                f"Not enough data points for metric '{metric}': "
+                f"need at least 2, got {len(points)}"
+            )
+
+        first_t, first_v = points[0]
+        last_t, last_v = points[-1]
+        duration = last_t - first_t
+
+        if duration == 0:
+            slope = 0.0
+        else:
+            slope = (last_v - first_v) / duration
+
+        return Trend(
+            metric=metric,
+            start_value=first_v,
+            end_value=last_v,
+            slope=slope,
+            duration_seconds=duration,
+        )

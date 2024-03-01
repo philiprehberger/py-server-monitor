@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.0 (2026-03-27)
+
+- Add historical trend tracking with ring buffer recording
+- Add `Trend` dataclass for trend analysis results
+- Add `Monitor.start_recording()` and `Monitor.stop_recording()` for background snapshot collection
+- Add `Monitor.get_trend()` for computing linear metric trends over a time window
+
 ## 0.1.8 (2026-03-22)
 
 - Add pytest and mypy configuration to pyproject.toml
