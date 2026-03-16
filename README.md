@@ -48,6 +48,14 @@ data = snap.to_dict()
 | Disk | mountpoint, total, used, free, percent |
 | Network | bytes_sent, bytes_recv, packets_sent, packets_recv |
 
+
+## Development
+
+```bash
+pip install -e .
+python -m pytest tests/ -v
+```
+
 ## License
 
 MIT
