@@ -1,5 +1,9 @@
 # philiprehberger-server-monitor
 
+[![Tests](https://github.com/philiprehberger/py-server-monitor/actions/workflows/publish.yml/badge.svg)](https://github.com/philiprehberger/py-server-monitor/actions/workflows/publish.yml)
+[![PyPI version](https://img.shields.io/pypi/v/philiprehberger-server-monitor.svg)](https://pypi.org/project/philiprehberger-server-monitor/)
+[![License](https://img.shields.io/github/license/philiprehberger/py-server-monitor)](LICENSE)
+
 System metrics collector for CPU, memory, disk, and network.
 
 ## Install
