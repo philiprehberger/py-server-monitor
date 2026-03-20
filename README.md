@@ -39,7 +39,7 @@ monitor.watch(
 data = snap.to_dict()
 ```
 
-## Metrics
+### Metrics
 
 | Category | Fields |
 |----------|--------|
@@ -47,7 +47,6 @@ data = snap.to_dict()
 | Memory | total, available, used, percent, total_gb, used_gb |
 | Disk | mountpoint, total, used, free, percent |
 | Network | bytes_sent, bytes_recv, packets_sent, packets_recv |
-
 
 ## API
 
