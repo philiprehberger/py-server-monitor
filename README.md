@@ -3,6 +3,7 @@
 [![Tests](https://github.com/philiprehberger/py-server-monitor/actions/workflows/publish.yml/badge.svg)](https://github.com/philiprehberger/py-server-monitor/actions/workflows/publish.yml)
 [![PyPI version](https://img.shields.io/pypi/v/philiprehberger-server-monitor.svg)](https://pypi.org/project/philiprehberger-server-monitor/)
 [![License](https://img.shields.io/github/license/philiprehberger/py-server-monitor)](LICENSE)
+[![Sponsor](https://img.shields.io/badge/sponsor-GitHub%20Sponsors-ec6cb9)](https://github.com/sponsors/philiprehberger)
 
 System metrics collector for CPU, memory, disk, and network.
 
