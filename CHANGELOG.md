@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0 (2026-04-27)
+
+- Add `Monitor.export_json(path)` to persist the recorded snapshot ring buffer as JSON
+- Add `Monitor.snapshots()` returning a defensive copy of the recorded buffer for external analysis
+- Replace 7-line import-only test with a comprehensive test suite covering snapshot types, metric lookup, export, and trend math
+
 ## 0.2.1 (2026-03-31)
 
 - Standardize README to 3-badge format with emoji Support section

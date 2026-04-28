@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import collections
+import json
 import threading
 import time
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any, Callable
 
 import psutil
@@ -326,6 +328,27 @@ class Monitor:
     def stop_recording(self) -> None:
         """Stop the recording thread."""
         self._recording = False
+
+    def snapshots(self) -> list[Snapshot]:
+        """Return a copy of the recorded snapshot ring buffer.
+
+        Safe to call while a recorder is running — the returned list is a
+        snapshot of the buffer at call time.
+        """
+        return list(self._snapshots)
+
+    def export_json(self, path: str | Path) -> None:
+        """Write the recorded snapshots to a JSON file.
+
+        Each snapshot is serialised via ``Snapshot.to_dict()``. Existing files
+        are overwritten.
+
+        Args:
+            path: Destination file path.
+        """
+        out_path = Path(path)
+        payload = {"snapshots": [s.to_dict() for s in self._snapshots]}
+        out_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
     def get_trend(self, metric: str, window_seconds: float = 300) -> Trend:
         """Compute a linear trend for a metric over recent snapshots.

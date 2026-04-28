@@ -64,6 +64,19 @@ print(f"CPU went from {trend.start_value}% to {trend.end_value}%")
 monitor.stop_recording()
 ```
 
+### Persisting Recorded Snapshots
+
+```python
+monitor = Monitor()
+monitor.start_recording(interval=5.0)
+# ... time passes ...
+monitor.export_json("metrics.json")
+
+# Or grab a defensive copy of the buffer for in-process analysis
+recent = monitor.snapshots()
+print(f"Have {len(recent)} snapshots")
+```
+
 ## API
 
 | Function / Class | Description |
@@ -79,6 +92,8 @@ monitor.stop_recording()
 | `monitor.start_recording(interval, max_snapshots)` | Start background snapshot recording into a ring buffer |
 | `monitor.stop_recording()` | Stop the recording thread |
 | `monitor.get_trend(metric, window_seconds)` | Compute linear trend for a metric over recent snapshots |
+| `monitor.snapshots()` | Return a copy of the recorded snapshot buffer |
+| `monitor.export_json(path)` | Write recorded snapshots to a JSON file |
 
 ## Development
 
