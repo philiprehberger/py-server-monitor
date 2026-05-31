@@ -64,6 +64,20 @@ print(f"CPU went from {trend.start_value}% to {trend.end_value}%")
 monitor.stop_recording()
 ```
 
+### Trailing-window averages
+
+```python
+from philiprehberger_server_monitor import Monitor
+
+monitor = Monitor()
+monitor.start_recording(interval=5.0)
+# ... time passes ...
+
+# Average CPU/memory % across snapshots in the trailing window (default 60s)
+print(f"Avg CPU (last 60s): {monitor.average_cpu():.1f}%")
+print(f"Avg memory (last 5 min): {monitor.average_memory(window_seconds=300):.1f}%")
+```
+
 ### Persisting Recorded Snapshots
 
 ```python
@@ -94,6 +108,8 @@ print(f"Have {len(recent)} snapshots")
 | `monitor.get_trend(metric, window_seconds)` | Compute linear trend for a metric over recent snapshots |
 | `monitor.snapshots()` | Return a copy of the recorded snapshot buffer |
 | `monitor.export_json(path)` | Write recorded snapshots to a JSON file |
+| `monitor.average_cpu(window_seconds=60)` | Mean CPU % across snapshots in the trailing window (0.0 if empty) |
+| `monitor.average_memory(window_seconds=60)` | Mean memory % across snapshots in the trailing window (0.0 if empty) |
 
 ## Development
 

@@ -350,6 +350,30 @@ class Monitor:
         payload = {"snapshots": [s.to_dict() for s in self._snapshots]}
         out_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
+    def average_cpu(self, window_seconds: float = 60) -> float:
+        """Return the average CPU usage % across snapshots within the trailing window.
+
+        Returns 0.0 when no snapshots fall within the window.
+        """
+        now = time.time()
+        cutoff = now - window_seconds
+        relevant = [s for s in self.snapshots() if s.timestamp >= cutoff]
+        if not relevant:
+            return 0.0
+        return sum(s.cpu.percent for s in relevant) / len(relevant)
+
+    def average_memory(self, window_seconds: float = 60) -> float:
+        """Return the average memory usage % across snapshots within the trailing window.
+
+        Returns 0.0 when no snapshots fall within the window.
+        """
+        now = time.time()
+        cutoff = now - window_seconds
+        relevant = [s for s in self.snapshots() if s.timestamp >= cutoff]
+        if not relevant:
+            return 0.0
+        return sum(s.memory.percent for s in relevant) / len(relevant)
+
     def get_trend(self, metric: str, window_seconds: float = 300) -> Trend:
         """Compute a linear trend for a metric over recent snapshots.
 

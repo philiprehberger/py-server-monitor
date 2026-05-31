@@ -134,6 +134,59 @@ def test_get_trend_raises_with_too_few_points():
         monitor.get_trend("cpu.percent")
 
 
+def test_average_cpu_within_window():
+    monitor = Monitor()
+    monitor._snapshots = collections.deque(maxlen=10)
+    now = time.time()
+    monitor._snapshots.append(_make_snapshot(timestamp=now - 5, cpu_pct=20.0))
+    monitor._snapshots.append(_make_snapshot(timestamp=now - 3, cpu_pct=40.0))
+    monitor._snapshots.append(_make_snapshot(timestamp=now - 1, cpu_pct=60.0))
+
+    assert monitor.average_cpu(window_seconds=60) == pytest.approx(40.0)
+
+
+def test_average_memory_within_window():
+    monitor = Monitor()
+    monitor._snapshots = collections.deque(maxlen=10)
+    now = time.time()
+    monitor._snapshots.append(_make_snapshot(timestamp=now - 5, mem_pct=30.0))
+    monitor._snapshots.append(_make_snapshot(timestamp=now - 3, mem_pct=50.0))
+    monitor._snapshots.append(_make_snapshot(timestamp=now - 1, mem_pct=70.0))
+
+    assert monitor.average_memory(window_seconds=60) == pytest.approx(50.0)
+
+
+def test_average_excludes_snapshots_outside_window():
+    monitor = Monitor()
+    monitor._snapshots = collections.deque(maxlen=10)
+    now = time.time()
+    # Outside the 10s window
+    monitor._snapshots.append(_make_snapshot(timestamp=now - 120, cpu_pct=99.0, mem_pct=99.0))
+    monitor._snapshots.append(_make_snapshot(timestamp=now - 100, cpu_pct=99.0, mem_pct=99.0))
+    # Inside the 10s window
+    monitor._snapshots.append(_make_snapshot(timestamp=now - 5, cpu_pct=10.0, mem_pct=20.0))
+    monitor._snapshots.append(_make_snapshot(timestamp=now - 1, cpu_pct=30.0, mem_pct=40.0))
+
+    assert monitor.average_cpu(window_seconds=10) == pytest.approx(20.0)
+    assert monitor.average_memory(window_seconds=10) == pytest.approx(30.0)
+
+
+def test_average_returns_zero_with_no_snapshots():
+    monitor = Monitor()
+    assert monitor.average_cpu() == 0.0
+    assert monitor.average_memory() == 0.0
+
+
+def test_average_returns_zero_when_all_snapshots_outside_window():
+    monitor = Monitor()
+    monitor._snapshots = collections.deque(maxlen=10)
+    now = time.time()
+    monitor._snapshots.append(_make_snapshot(timestamp=now - 500, cpu_pct=50.0, mem_pct=50.0))
+
+    assert monitor.average_cpu(window_seconds=60) == 0.0
+    assert monitor.average_memory(window_seconds=60) == 0.0
+
+
 def test_alert_dataclass_defaults():
     fired: list[tuple[str, float, float]] = []
     alert = Alert(

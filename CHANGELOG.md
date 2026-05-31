@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.0 (2026-05-30)
+
+- Add `Monitor.average_cpu()` for trailing-window CPU averaging
+- Add `Monitor.average_memory()` for trailing-window memory averaging
+
 ## 0.3.0 (2026-04-27)
 
 - Add `Monitor.export_json(path)` to persist the recorded snapshot ring buffer as JSON
